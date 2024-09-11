@@ -74,42 +74,10 @@ namespace UDService
             return user;
         }
 
-        // Delete
-        public async Task<bool> DeleteAsync(int id)
-        {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
-                return false;
-
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
         // Get one entity by lambda expression
         public async Task<User?> GetOneByConditionAsync(Expression<Func<User, bool>> expression)
         {
             return await _context.Users.FirstOrDefaultAsync(expression);
-        }
-
-        // Get multiple entities by IDs
-        public async Task<IEnumerable<User>> GetByIdsAsync(IEnumerable<int> ids)
-        {
-            return await _context.Users.Where(u => ids.Contains(u.Id)).ToListAsync();
-        }
-
-        // Count entities
-        public async Task<int> CountAsync(Expression<Func<User, bool>>? expression = null)
-        {
-            return expression == null
-                ? await _context.Users.CountAsync()
-                : await _context.Users.CountAsync(expression);
-        }
-
-        // Check if any entity satisfies a condition
-        public async Task<bool> AnyAsync(Expression<Func<User, bool>> expression)
-        {
-            return await _context.Users.AnyAsync(expression);
         }
     }
 }

@@ -74,42 +74,10 @@ namespace DDService
             return drive;
         }
 
-        // Delete
-        public async Task<bool> DeleteAsync(int id)
-        {
-            var user = await _context.Drives.FindAsync(id);
-            if (user == null)
-                return false;
-
-            _context.Drives.Remove(user);
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
         // Get one entity by lambda expression
         public async Task<Drive?> GetOneByConditionAsync(Expression<Func<Drive, bool>> expression)
         {
             return await _context.Drives.FirstOrDefaultAsync(expression);
-        }
-
-        // Get multiple entities by IDs
-        public async Task<IEnumerable<Drive>> GetByIdsAsync(IEnumerable<int> ids)
-        {
-            return await _context.Drives.Where(u => ids.Contains(u.Id)).ToListAsync();
-        }
-
-        // Count entities
-        public async Task<int> CountAsync(Expression<Func<Drive, bool>>? expression = null)
-        {
-            return expression == null
-                ? await _context.Drives.CountAsync()
-                : await _context.Drives.CountAsync(expression);
-        }
-
-        // Check if any entity satisfies a condition
-        public async Task<bool> AnyAsync(Expression<Func<Drive, bool>> expression)
-        {
-            return await _context.Drives.AnyAsync(expression);
         }
     }
 }

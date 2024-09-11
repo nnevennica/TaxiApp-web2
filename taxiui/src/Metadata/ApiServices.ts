@@ -11,6 +11,13 @@ import { jwtDecode } from "jwt-decode";
 
 const API_URL = import.meta.env.VITE_TSF;
 
+// Utility function to get the token from localStorage
+const getAuthToken = () => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No token found.");
+  return token;
+};
+
 export const loginService = async (data: LoginDto): Promise<string | null> => {
   try {
     const response = await axios.post(`${API_URL}auth/login`, data);
@@ -34,9 +41,7 @@ export const registerService = async (
 };
 
 export const fetchUserData = async (): Promise<UserDto> => {
-  const token = localStorage.getItem("token");
-  if (!token) throw new Error("No token found.");
-
+  const token = getAuthToken();
   const { id } = jwtDecode<{ id: number }>(token);
   const response = await axios.get<UserDto>(`${API_URL}user/${id}`, {
     headers: {
@@ -47,9 +52,7 @@ export const fetchUserData = async (): Promise<UserDto> => {
 };
 
 export const updateUser = async (data: UserDto): Promise<void> => {
-  const token = localStorage.getItem("token");
-  if (!token) throw new Error("No token found.");
-
+  const token = getAuthToken();
   await axios.put(`${API_URL}user`, data, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -68,7 +71,7 @@ export const fetchDrives = async (
         user: userId,
       },
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${getAuthToken()}`,
       },
     });
     return response.data;
@@ -80,7 +83,11 @@ export const fetchDrives = async (
 
 export const fetchDrivers = async (): Promise<UserDto[]> => {
   try {
-    const response = await axios.get(`${API_URL}drivers`);
+    const response = await axios.get(`${API_URL}drivers`, {
+      headers: {
+        Authorization: `Bearer ${getAuthToken()}`,
+      },
+    });
     return response.data;
   } catch {
     throw new Error("Failed to fetch drivers.");
@@ -92,10 +99,15 @@ export const verifyDriver = async (
   status: string
 ): Promise<void> => {
   try {
-    await axios.post(`${API_URL}driver/verify/${driverId}/${status}`, {
-      driver: driverId,
-      ver: status,
-    });
+    await axios.post(
+      `${API_URL}driver/verify/${driverId}/${status}`,
+      { driver: driverId, ver: status },
+      {
+        headers: {
+          Authorization: `Bearer ${getAuthToken()}`,
+        },
+      }
+    );
   } catch {
     throw new Error("Failed to verify driver.");
   }
@@ -103,9 +115,15 @@ export const verifyDriver = async (
 
 export const blockDriver = async (driverId: number): Promise<void> => {
   try {
-    await axios.post(`${API_URL}driver/block/${driverId}`, {
-      driver: driverId,
-    });
+    await axios.post(
+      `${API_URL}driver/block/${driverId}`,
+      { driver: driverId },
+      {
+        headers: {
+          Authorization: `Bearer ${getAuthToken()}`,
+        },
+      }
+    );
   } catch {
     throw new Error("Failed to block/unblock driver.");
   }
@@ -116,7 +134,7 @@ export const addDrive = async (drive: AddDriveDto): Promise<void> => {
     const response = await axios.post(`${API_URL}drive`, drive, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${getAuthToken()}`,
       },
     });
 
@@ -133,7 +151,7 @@ export const fetchNewDrives = async (): Promise<DriveDto[]> => {
   try {
     const response = await axios.get(`${API_URL}drives/new`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${getAuthToken()}`,
       },
     });
     return response.data;
@@ -145,9 +163,7 @@ export const fetchNewDrives = async (): Promise<DriveDto[]> => {
 
 export const acceptDrive = async (driveDto: DriveDto): Promise<void> => {
   try {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("No token found");
-
+    const token = getAuthToken();
     const user = JSON.parse(atob(token.split(".")[1]));
 
     const updatedDriveDto = {
@@ -182,7 +198,7 @@ export const fetchDriveState = async (
   try {
     const response = await axios.get(`${API_URL}state/${userId}/${isDriver}`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${getAuthToken()}`,
       },
     });
 
@@ -207,7 +223,7 @@ export const rateDriver = async (
       {},
       {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${getAuthToken()}`,
         },
       }
     );

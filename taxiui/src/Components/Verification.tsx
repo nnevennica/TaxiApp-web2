@@ -42,16 +42,7 @@ const Verification: React.FC<VerificationProps> = ({
           status === "Allowed" ? "allowed" : "disallowed"
         } successfully.`
       );
-      setDrivers(
-        drivers.map((driver) =>
-          driver.id === driverId
-            ? {
-                ...driver,
-                accountStatus: status === "Allowed" ? "Allowed" : "Disallowed",
-              }
-            : driver
-        )
-      );
+      window.location.reload();
     } catch {
       toast.error("Failed to verify driver.");
     }
@@ -60,18 +51,9 @@ const Verification: React.FC<VerificationProps> = ({
   const handleBlockUnblock = async (driverId: number) => {
     try {
       await blockDriver(driverId);
+      console.log(drivers)
       toast.success("Driver status updated successfully.");
-      setDrivers(
-        drivers.map((driver) =>
-          driver.id === driverId
-            ? {
-                ...driver,
-                accountStatus:
-                  driver.accountStatus === "Blocked" ? "Allowed" : "Blocked",
-              }
-            : driver
-        )
-      );
+      window.location.reload();
     } catch {
       toast.error("Failed to update driver status.");
     }
@@ -142,16 +124,16 @@ const Verification: React.FC<VerificationProps> = ({
                     <button
                       onClick={() => handleBlockUnblock(driver.id)}
                       className={`bg-${
-                        driver.accountStatus === "Blocked"
+                        driver.blocked
                           ? "emerald-600"
                           : "pink-600"
                       } hover:bg-${
-                        driver.accountStatus === "Blocked"
+                        driver.blocked
                           ? "emerald-600/80"
                           : "pink-600/80"
                       } text-white font-bold py-1 px-2 rounded`}
                     >
-                      {driver.accountStatus === "Blocked" ? "Unblock" : "Block"}
+                      {driver.blocked ? "Unblock" : "Block"}
                     </button>
                   )}
                 </td>
